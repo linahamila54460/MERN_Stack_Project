@@ -1,0 +1,37 @@
+# Define the pipeline stages
+stages:
+  - build
+
+variables:
+  IMAGE_TAG: "$CI_COMMIT_SHORT_SHA" # Tag to apply to docker images when pushed to registry (commit id)
+
+# Build Docker images for frontend and backend
+build_images:
+  stage: build
+  image: docker:20.10.16 # Container image that provides the docker CLI
+  services:
+    - docker:20.10.16-dind # Docker daemon service used to actually build images
+  script:
+    # Auth to the GitLab Container Registry
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+      
+    # Build frontend Docker Image from its directory in the project
+    - docker build -t "$CI_REGISTRY_IMAGE/frontend:$IMAGE_TAG" ./mern/frontend
+    # Push frontend image 
+    - docker push "$CI_REGISTRY_IMAGE/frontend:$IMAGE_TAG"
+      
+    # Build backend Docker Image from its directory in the project
+    - docker build -t "$CI_REGISTRY_IMAGE/backend:$IMAGE_TAG" ./mern/backend
+    # Push backend image 
+    - docker push "$CI_REGISTRY_IMAGE/backend:$IMAGE_TAG"
+  
+  # Restricts this job to only run when changes are pushed to the main branch
+  only:
+    - main
+
+# Built-in GitLab CI/CD variables used in this job:
+# - CI_COMMIT_SHORT_SHA: short commit id used to tag Docker images
+# - CI_REGISTRY: GitLab Container Registry hostname (where images are pushed)
+# - CI_REGISTRY_USER: registry username provided by GitLab CI for login
+# - CI_REGISTRY_PASSWORD: registry password/token provided by GitLab CI for login
+# - CI_REGISTRY_IMAGE: base registry image path for this project
