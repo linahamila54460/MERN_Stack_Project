@@ -1,38 +1,45 @@
+#An ingress receives external http/https traffic and routes requests to the correct service
+
+#Frontend Ingress
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: frontend-ingress
   namespace: mern
 spec:
-  ingressClassName: nginx
+#ngnix is the actual software that is handling routing
+  ingressClassName: nginx #nginix is an open-source software used primarily as a web server, reverse proxy, load balancer, and HTTP cache
+  
   rules:
+  #Only handle requests that are coming to mern.local
     - host: mern.local
+    #Any rquest to mern.local → go to the frontend.
       http:
         paths:
-          - path: /
+          - path: / #if request starts with /
             pathType: Prefix
+            #backend here means: the destination to forward this traffic to
             backend:
               service:
                 name: frontend
                 port:
                   number: 5173
 ---
+
+# Backend Ingress
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: backend-ingress
   namespace: mern
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
     - host: mern.local
       http:
         paths:
-          - path: /api(/|$)(.*)
-            pathType: ImplementationSpecific
+          - path: /api
+            pathType: Prefix
             backend:
               service:
                 name: backend
