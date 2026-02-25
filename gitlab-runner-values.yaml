@@ -1,0 +1,15 @@
+gitlabUrl: "https://gitlab.com/"
+runnerToken: "emptynotoken"
+
+rbac:
+  create: true
+
+serviceAccount:
+  create: true
+  name: gitlab-runner
+
+runners:
+  tags: "kind"
+  runUntagged: false
+  locked: false
+  privileged: true
