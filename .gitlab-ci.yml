@@ -10,7 +10,7 @@ build_images:
   stage: build
   image: docker:20.10.16 # Container image that provides the docker CLI
   services:
-    - docker:20.10.16-dind # Docker daemon service used to actually build images
+    - docker:20.10.16-dind # Docker service used to build images
   script:
     # Auth to the GitLab Container Registry
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
